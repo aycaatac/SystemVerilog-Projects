@@ -1,0 +1,80 @@
+module MultifunctRegBasys(input [8:0] sw,output [3:0] led);
+//sw[0] = d0 d4 = s0 d5 = s1 d6 = shr_in d7 = shl_in d8 = reset qo = led[0]
+logic i0, i1, i2, i3;
+logic o0, o1, o2, o3;
+ClockSlower clock(.clk(clk),.slow_clk(i4));
+mux4_1 m1(o3, sw[3], sw[6], o2, sw[5], sw[4], i3);
+mux4_1 m2(o2, sw[2], o3, o1, sw[5], sw[4], i2);
+mux4_1 m3(o1, sw[1], o2, o0, sw[5], sw[4], i1);
+mux4_1 m4(o0, sw[0], o1, sw[7], sw[5], sw[4], i0);
+
+SynResDFF f1(i4, reset, i3, o3);
+SynResDFF f2(i4, reset, i2, o2);
+SynResDFF f3(i4, reset, i1, o1);
+SynResDFF f4(i4, reset, i0, o0);
+
+assign led[0] = o0;
+assign led[1] = o1;
+assign led[2] = o2;
+assign led[3] = o3;
+
+endmodule
+
+module ClockSlower 
+(
+  input clk,         
+  output reg slow_clk  
+);
+
+  reg [32:0] counter;    
+  parameter DIVIDER = 500; 
+
+  always @(posedge clk) begin
+    if (counter == 999999) begin
+      counter <= 0;
+      slow_clk <= ~slow_clk; 
+    end
+    else begin
+      counter <= counter + 1;
+    end
+  end
+
+endmodule
+
+
+
+
+
+
+
+
+set_property PACKAGE_PIN V17 [get_ports {sw[0]}] 	 	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {sw[0]}] 
+set_property PACKAGE_PIN V16 [get_ports {sw[1]}] 	 	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {sw[1]}] 
+set_property PACKAGE_PIN W16 [get_ports {sw[2]}] 	 	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {sw[2]}] 
+set_property PACKAGE_PIN W17 [get_ports {sw[3]}] 	 	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {sw[3]}] 
+set_property PACKAGE_PIN W15 [get_ports {sw[4]}] 	 	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {sw[4]}] 
+set_property PACKAGE_PIN V15 [get_ports {sw[5]}] 	 	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {sw[5]}] 
+set_property PACKAGE_PIN W14 [get_ports {sw[6]}] 	 	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {sw[6]}] 
+set_property PACKAGE_PIN W13 [get_ports {sw[7]}] 	 	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {sw[7]}] 
+set_property PACKAGE_PIN V2 [get_ports {sw[8]}] 	 	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {sw[8]}]
+
+set_property PACKAGE_PIN W5 [get_ports clk]  	 	 	 	  
+ 	set_property IOSTANDARD LVCMOS33 [get_ports clk] 
+
+set_property PACKAGE_PIN U16 [get_ports {led[0]}]  	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {led[0]}] 
+set_property PACKAGE_PIN E19 [get_ports {led[1]}]  	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {led[1]}] 
+set_property PACKAGE_PIN U19 [get_ports {led[2]}]  	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {led[2]}] 
+set_property PACKAGE_PIN V19 [get_ports {led[3]}]  	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {led[3]}] 

@@ -1,0 +1,229 @@
+module full_adder(input A, B, C, output Sum, Cout);
+wire W1, W2, W3;
+xor xor1(W1, A, B);
+and and1(W2, A, B);
+xor xor2(Sum, C, W1);
+and and2(W3, W1, C);
+or or1(Cout, W3, W2);
+endmodule
+
+module full_subtractor(input A, B, C, output Diff, Bout);
+wire W1, W2, W3;
+xor xor1(W1, A, B);
+and and1(W2, B, ~A);
+xor xor2(Diff, W1, C);
+and and2(W3, C, ~W1);
+or or1(Bout, W2, W3);
+endmodule
+
+
+module two_bit_adder(input A, B, C, D, E, output Sum1, Sum2, Cout2);
+logic Cout1;
+full_adder fa1(A, B, C, Sum1, Cout1);
+full_adder fa2(D, E, Cout1, Sum2, Cout2);
+endmodule
+
+module basysFullAdder(input [2:0] sw, output [1:0] led);
+  wire w1, w2;
+  full_adder fa1(sw[0], sw[1], sw[2], w1, w2);
+  
+  assign led[0] = w1;
+  assign led[1] = w2;
+endmodule
+
+module basysFullSubtractor(input [2:0] sw, output [1:0] led);
+  wire w1, w2;
+  full_subtractor fs1(sw[0], sw[1], sw[2], w1, w2);
+  
+  assign led[0] = w1;
+  assign led[1] = w2;
+endmodule
+
+module basysTwoBitAdder(input [4:0] sw, output [2:0] led);
+  wire w1, w2, w3;
+  two_bit_adder tba(sw[0], sw[1], sw[2], sw[3], sw[4], w1, w2, w3);
+  
+  assign led[0] = w1;
+  assign led[1] = w2;
+  assign led[2] = w3;
+endmodule
+
+module full_adder_tb();
+reg A, B, C;
+wire Sum, Cout;
+full_adder fa1(A, B, C, Sum, Cout);
+initial begin
+A = 0; B = 0; C= 0; #10;
+A = 0; B = 0; C = 1; #10;
+A = 0; B = 1; C = 0; #10;
+A = 0; B = 1; C = 1; #10;
+A = 1; B = 0; C = 0; #10;
+A = 1; B = 0; C = 1; #10;
+A = 1; B = 1; C = 0; #10;
+A = 1; B = 1; C = 1; #10;
+
+$finish;
+end 
+endmodule 
+
+
+module full_subtractor_tb();
+reg A, B, C;
+wire Diff, Bout;
+full_subtractor fs1(A, B, C, Diff, Bout);
+initial begin
+A = 0; B = 0; C= 0; #10;
+A = 0; B = 0; C= 1; #10;
+A = 0; B = 1; C= 0; #10;
+A = 0; B = 1; C= 1; #10;
+A = 1; B = 0; C= 0; #10;
+A = 1; B = 0; C= 1; #10;
+A = 1; B = 1; C= 0; #10;
+A = 1; B = 1; C= 1; #10;
+
+$finish;
+end 
+endmodule
+
+
+module two_bit_adder_tb();
+logic A, B, C, D, E, Sum1, Sum2, Cout2;
+two_bit_adder tba(A, B, C, D, E, Sum1, Sum2, Cout2);
+initial begin
+A = 0; B = 0; C = 0; D = 0; E = 0; #10;
+A = 0; B = 0; C = 0; D = 0; E = 1; #10;
+A = 0; B = 0; C = 0; D = 1; E = 0; #10;
+A = 0; B = 0; C = 0; D = 1; E = 1; #10;
+A = 0; B = 0; C = 1; D = 0; E = 0; #10;
+A = 0; B = 0; C = 1; D = 0; E = 1; #10;
+A = 0; B = 0; C = 1; D = 1; E = 0; #10;
+A = 0; B = 0; C = 1; D = 1; E = 1; #10;
+A = 0; B = 1; C = 0; D = 0; E = 0; #10;
+A = 0; B = 1; C = 0; D = 0; E = 1; #10;
+A = 0; B = 1; C = 0; D = 1; E = 0; #10;
+A = 0; B = 1; C = 0; D = 1; E = 1; #10;
+A = 0; B = 1; C = 1; D = 0; E = 0; #10;
+A = 0; B = 1; C = 1; D = 0; E = 1; #10;
+A = 0; B = 1; C = 1; D = 1; E = 0; #10;
+A = 0; B = 1; C = 1; D = 1; E = 1; #10;
+A = 1; B = 0; C = 0; D = 0; E = 0; #10;
+A = 1; B = 0; C = 0; D = 0; E = 1; #10;
+A = 1; B = 0; C = 0; D = 1; E = 0; #10;
+A = 1; B = 0; C = 0; D = 1; E = 1; #10;
+A = 1; B = 0; C = 1; D = 0; E = 0; #10;
+A = 1; B = 0; C = 1; D = 0; E = 1; #10;
+A = 1; B = 0; C = 1; D = 1; E = 0; #10;
+A = 1; B = 0; C = 1; D = 1; E = 1; #10;
+A = 1; B = 1; C = 0; D = 0; E = 0; #10;
+A = 1; B = 1; C = 0; D = 0; E = 1; #10;
+A = 1; B = 1; C = 0; D = 1; E = 0; #10;
+A = 1; B = 1; C = 0; D = 1; E = 1; #10;
+A = 1; B = 1; C = 1; D = 0; E = 0; #10;
+A = 1; B = 1; C = 1; D = 0; E = 1; #10;
+A = 1; B = 1; C = 1; D = 1; E = 0; #10;
+A = 1; B = 1; C = 1; D = 1; E = 1; #10;
+
+$finish;
+end 
+endmodule
+
+module basysFullAdder_tb();
+  reg [2:0] sw;      
+  wire [1:0] led;    
+  
+  basysFullAdder uut(.sw(sw), .led(led));
+  
+  initial begin
+sw[0]= 0; sw[1] = 0; sw[2]= 0; #10;
+sw[0]= 0; sw[1] = 0; sw[2]= 1; #10;
+sw[0]= 0; sw[1] = 1; sw[2]= 0; #10;
+sw[0]= 0; sw[1] = 1; sw[2]= 1; #10;
+sw[0]= 1; sw[1] = 0; sw[2]= 0; #10;
+sw[0]= 1; sw[1] = 0; sw[2]= 1; #10;
+sw[0]= 1; sw[1] = 1; sw[2]= 0; #10;
+sw[0]= 1; sw[1] = 1; sw[2]= 1; #10;
+
+    $finish;
+  end
+endmodule
+
+module basysFullSubtractor_tb();
+reg [2:0] sw;     
+wire [1:0] led;
+basysFullSubtractor uut(.sw(sw), .led(led));
+initial begin
+sw[0]= 0; sw[1] = 0; sw[2]= 0; #10;
+sw[0]= 0; sw[1] = 0; sw[2]= 1; #10;
+sw[0]= 0; sw[1] = 1; sw[2]= 0; #10;
+sw[0]= 0; sw[1] = 1; sw[2]= 1; #10;
+sw[0]= 1; sw[1] = 0; sw[2]= 0; #10;
+sw[0]= 1; sw[1] = 0; sw[2]= 1; #10;
+sw[0]= 1; sw[1] = 1; sw[2]= 0; #10;
+sw[0]= 1; sw[1] = 1; sw[2]= 1; #10;
+$finish;
+end
+endmodule
+
+module basysTwoBitAdder_tb();
+reg [4:0] sw;
+wire [2:0] led;
+
+basysTwoBitAdder test(.sw(sw), .led(led));
+initial begin
+    sw = 5'b00000; #10;
+    sw = 5'b00001; #10;
+    sw = 5'b00010; #10;
+    sw = 5'b00011; #10;
+    sw = 5'b00100; #10;
+    sw = 5'b00101; #10;
+    sw = 5'b00110; #10;
+    sw = 5'b00111; #10;
+    sw = 5'b01000; #10;
+    sw = 5'b01001; #10;
+    sw = 5'b01010; #10;
+    sw = 5'b01011; #10;
+    sw = 5'b01100; #10;
+    sw = 5'b01101; #10;
+    sw = 5'b01110; #10;
+    sw = 5'b01111; #10;
+    sw = 5'b10000; #10;
+    sw = 5'b10001; #10;
+    sw = 5'b10010; #10;
+    sw = 5'b10011; #10;
+    sw = 5'b10100; #10;
+    sw = 5'b10101; #10;
+    sw = 5'b10110; #10;
+    sw = 5'b10111; #10;
+    sw = 5'b11000; #10;
+    sw = 5'b11001; #10;
+    sw = 5'b11010; #10;
+    sw = 5'b11011; #10;
+    sw = 5'b11100; #10;
+    sw = 5'b11101; #10;
+    sw = 5'b11110; #10;
+    sw = 5'b11111; #10;
+    
+    $finish;
+    end
+    endmodule
+
+
+
+set_property PACKAGE_PIN V17 [get_ports {sw[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {sw[0]}]
+set_property PACKAGE_PIN V16 [get_ports {sw[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {sw[1]}]
+set_property PACKAGE_PIN W16 [get_ports {sw[2]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {sw[2]}]
+set_property PACKAGE_PIN W17 [get_ports {sw[3]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {sw[3]}]
+set_property PACKAGE_PIN W15 [get_ports {sw[4]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {sw[4]}]
+
+
+set_property PACKAGE_PIN U16 [get_ports {led[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {led[0]}]
+set_property PACKAGE_PIN E19 [get_ports {led[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {led[1]}]
+set_property PACKAGE_PIN U19 [get_ports {led[2]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {led[2]}]

@@ -1,0 +1,152 @@
+module FSM(input logic clk, input logic reset, input logic SA, input logic SB, output logic [2:0] LA, LB);
+typedef enum logic [2:0] {S0, S1, S2, S3, S4, S5, S6, S7}
+statetype;
+statetype [1:0] state, nextstate;
+
+parameter green = 3'b011;
+parameter yellow = 3'b001;
+parameter red = 3'b111;
+
+//reg
+always_ff @ (posedge clk, posedge reset)
+if (reset)
+state <= S0;
+else state <= nextstate;
+//next state part
+always_comb
+case (state)
+S0: if (SA) nextstate = S0; 
+else nextstate = S1;
+S1: nextstate = S2;
+S2: nextstate = S3;
+S3: nextstate = S4;
+S4: if (SB) nextstate = S4;
+else nextstate = S5;
+S5: nextstate = S6;
+S6: nextstate = S7;
+S7: nextstate = S0;
+default: nextstate = S0;
+endcase
+//output part
+always_comb
+case(state)
+S0: {LA, LB} = {green, red};
+S1: {LA, LB} = {yellow, red};
+S2: {LA, LB} = {red, red};
+S3: {LA, LB} = {red, yellow};
+S4: {LA, LB} = {red, green};
+S5: {LA, LB} = {red, yellow};
+S6: {LA, LB} = {red, red};
+S7: {LA, LB} = {yellow, red};
+endcase
+endmodule
+
+module ClockDivider( input clk, input rst, output logic clk_out); localparam constantNumber = 150000000;
+logic [31:0] count;
+always @ (posedge(clk), posedge(rst))
+begin
+if (rst == 1'b1)
+count <= 32'b0;
+else if (count == constantNumber - 1)
+count <= 32'b0;
+else
+count <= count + 1;
+end
+always @ (posedge(clk), posedge(rst))
+begin
+if (rst == 1'b1)
+clk_out <= 1'b0;
+else if (count == constantNumber - 1)
+clk_out <= ~clk_out;
+else
+clk_out <= clk_out;
+end
+endmodule
+
+
+module TrafficSystem( input logic clk, input logic reset, input logic
+SA, input logic SB, output logic [2:0] ledA, ledB);
+logic clk_slow;
+logic LA, LB;
+ClockDivider clock( clk, reset, clk_slow);
+FSM fsm(clk, reset, SA, SB, LA, LB);
+
+assign ledA = LA;   
+assign ledB = LB;
+endmodule
+`timescale 1ns / 1ps
+
+module TrafficSystemBasys( input logic clk, input logic sw[2:0], output logic led[6:0]);
+logic clk_slow;
+logic [2:0] LA, LB;
+ClockDivider clock( clk, sw[0], clk_slow);
+FSM fsm(clk_slow, sw[0], sw[1], sw[2], LA, LB);
+assign led[0] = LA[0];  
+assign led[1] = LA[1];  
+assign led[2] = LA[2];  
+assign led[3] = 0;  
+assign led[4] = LB[0];  
+assign led[5] = LB[1];  
+assign led[6] = LB[2];   
+
+endmodule
+`timescale 1ns / 1ps
+
+
+
+
+
+
+
+module TrafficSystem_tb();
+logic clk, reset;
+logic SA, SB;
+logic [2:0] LA, LB;
+FSM dut(clk, reset, SA, SB, LA, LB);
+always begin
+clk = 1; #5;
+clk = 0; #5;
+end
+initial begin
+SA = 1; SB = 1; reset = 0; #10;
+SA = 0; SB = 1; reset = 0; #10;
+SA = 1; SB = 1; reset = 0; #10;
+SA = 1; SB = 1; reset = 0; #10;
+SA = 1; SB = 1; reset = 1; #10;
+SA = 0; SB = 0; reset = 0; #10;
+SA = 1; SB = 0; reset = 0; #10;
+end
+always begin
+clk <= 1; #5;
+clk <= 0; #5;
+end
+endmodule
+
+
+
+
+
+
+
+set_property PACKAGE_PIN W5 [get_ports clk]  	 	 	 	  
+ 	set_property IOSTANDARD LVCMOS33 [get_ports clk] 
+set_property PACKAGE_PIN V17 [get_ports {sw[0]}] 	 	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {sw[0]}] 
+set_property PACKAGE_PIN V16 [get_ports {sw[1]}] 	 	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {sw[1]}] 
+set_property PACKAGE_PIN W16 [get_ports {sw[2]}] 	 	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {sw[2]}] 
+set_property PACKAGE_PIN U16 [get_ports {led[0]}]  	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {led[0]}] 
+set_property PACKAGE_PIN E19 [get_ports {led[1]}]  	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {led[1]}] 
+set_property PACKAGE_PIN U19 [get_ports {led[2]}]  	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {led[2]}] 
+set_property PACKAGE_PIN V19 [get_ports {led[3]}]  	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {led[3]}] 
+set_property PACKAGE_PIN W18 [get_ports {led[4]}]  	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {led[4]}] 
+set_property PACKAGE_PIN U15 [get_ports {led[5]}]  	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {led[5]}] 
+set_property PACKAGE_PIN U14 [get_ports {led[6]}]  	 	 	 	 
+ 	set_property IOSTANDARD LVCMOS33 [get_ports {led[6]}] 
